@@ -1,0 +1,5 @@
+{
+  "name": "TakoTakip",
+  "description": "An application for drivers to manually log their activities (driving, break, rest, other work) and receive real-time alerts and violation notifications based on tachograph regulations (EC 561/2006 and AETR).",
+  "requestFramePermissions": []
+}
