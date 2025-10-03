@@ -49,8 +49,14 @@ const ActivityForm: React.FC<ActivityFormProps> = ({ onSave, activityToEdit, las
       setStart(toDateTimeLocal(activityToEdit.start));
       setEnd(toDateTimeLocal(activityToEdit.end));
     } else {
-      const defaultStartDate = lastActivityEnd || new Date();
+      // For NEW activities, always default the start time to the current moment
+      // to facilitate real-time logging, as requested by the user.
+      // The previous logic chained from the last activity's end time, which was
+      // inconvenient when logging activities as they happen (e.g., starting a drive
+      // a few minutes after starting work).
+      const defaultStartDate = new Date();
       setStart(toDateTimeLocal(defaultStartDate));
+      
       // Set default type based on workflow
       if (canStartWork) {
         setType(ActivityType.START_WORK);
@@ -64,7 +70,7 @@ const ActivityForm: React.FC<ActivityFormProps> = ({ onSave, activityToEdit, las
     setNextActivityType(ActivityType.DRIVING);
     setNextActivityEnd('');
 
-  }, [activityToEdit, lastActivityEnd, canStartWork]);
+  }, [activityToEdit, canStartWork]);
   
   // Effect to apply default durations when type or start date changes for a NEW activity
   useEffect(() => {
