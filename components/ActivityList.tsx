@@ -1,11 +1,12 @@
 import React from 'react';
-import { Activity, ActivityType } from '../types';
+import { Activity, ActivityType, Suggestion, ViolationLevel } from '../types';
 import { formatDateTime, formatDuration } from '../utils/formatters';
 
 interface ActivityListProps {
   activities: Activity[];
   onEdit: (activity: Activity) => void;
   onDelete: (id: string) => void;
+  suggestion: Suggestion;
 }
 
 const ActivityIcon: React.FC<{ type: ActivityType }> = ({ type }) => {
@@ -28,10 +29,40 @@ const ActivityIcon: React.FC<{ type: ActivityType }> = ({ type }) => {
 };
 
 
-const ActivityList: React.FC<ActivityListProps> = ({ activities, onEdit, onDelete }) => {
+const ActivityList: React.FC<ActivityListProps> = ({ activities, onEdit, onDelete, suggestion }) => {
+  const getSuggestionStyle = () => {
+    if (!suggestion) return null;
+
+    const { level } = suggestion;
+
+    switch (level) {
+      case ViolationLevel.Violation:
+        return {
+          icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>,
+          className: 'bg-red-100 dark:bg-red-900 dark:bg-opacity-40 text-red-800 dark:text-red-300 border border-red-300 dark:border-red-700'
+        };
+      case ViolationLevel.Warning:
+        return {
+          icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>,
+          className: 'bg-yellow-100 dark:bg-yellow-900 dark:bg-opacity-40 text-yellow-800 dark:text-yellow-300 border border-yellow-300 dark:border-yellow-700'
+        };
+      default: // Info
+        return {
+          icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>,
+          className: 'bg-cyan-100 dark:bg-cyan-900 dark:bg-opacity-40 text-cyan-800 dark:text-cyan-300 border border-cyan-300 dark:border-cyan-700'
+        };
+    }
+  };
+  const suggestionStyle = getSuggestionStyle();
 
   return (
     <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl h-full flex flex-col border border-gray-200 dark:border-transparent">
+      {suggestionStyle && (
+          <div className={`flex items-start space-x-3 p-3 mb-4 rounded-lg ${suggestionStyle.className}`}>
+              <div className="flex-shrink-0 mt-0.5">{suggestionStyle.icon}</div>
+              <p className="flex-1 font-semibold">{suggestion.message}</p>
+          </div>
+      )}
       <h2 className="text-2xl font-bold mb-4 text-cyan-600 dark:text-cyan-400">Faaliyet Listesi</h2>
       <div className="space-y-3 flex-grow overflow-y-auto pr-2">
         {activities.length === 0 ? (

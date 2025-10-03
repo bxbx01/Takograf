@@ -215,13 +215,18 @@ const App: React.FC = () => {
         </div>
       </header>
 
-      <main className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-6">
+      <main className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="lg:col-span-1 space-y-6">
           <StatusSummaryComponent summary={summary} />
           <ViolationDisplay violations={violations} />
         </div>
         <div className="lg:col-span-1">
-          <ActivityList activities={chronoSortedActivities} onEdit={handleEditActivity} onDelete={handleDeleteActivity} />
+          <ActivityList
+            activities={chronoSortedActivities}
+            onEdit={handleEditActivity}
+            onDelete={handleDeleteActivity}
+            suggestion={summary.nextActionSuggestion}
+          />
         </div>
       </main>
     </div>
