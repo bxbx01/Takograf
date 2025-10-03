@@ -25,10 +25,14 @@ import { formatDuration, formatFullDuration } from '../utils/formatters';
 // --- Internal Helper Functions ---
 
 const processOngoingActivities = (activities: Activity[]): Activity[] => {
+    // According to tachograph rules, time is measured in full minutes.
+    // We floor the current time to the last full minute to avoid calculations based on seconds.
+    // This ensures that a limit is only considered passed when the next full minute begins.
     const now = new Date();
+    const effectiveNow = new Date(Math.floor(now.getTime() / MINUTE) * MINUTE);
     return activities.map(act => {
         if (act.end === null) {
-            return { ...act, end: now };
+            return { ...act, end: effectiveNow };
         }
         return act;
     });

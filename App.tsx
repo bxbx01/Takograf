@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Activity, AppSettings, StatusSummary, ActivityType } from './types';
 import ActivityForm from './components/ActivityForm';
@@ -80,17 +81,25 @@ const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<'main' | 'reports'>('main');
   const [isActivityFormOpen, setIsActivityFormOpen] = useState(false);
   
-  // Refresh the summary every 30 seconds to update ongoing activities
+  // Refresh the summary precisely on minute changes to align with tachograph behavior.
   useEffect(() => {
     const hasOngoingActivity = activities.some(act => act.end === null);
-    if (hasOngoingActivity) {
-      const interval = setInterval(() => {
-        // This is a dummy state update to trigger a re-render and thus re-calculation
-        // of the summary, which uses `new Date()` for ongoing tasks.
-        setActivities(acts => [...acts]); 
-      }, 30 * 1000); // every 30 seconds
-      return () => clearInterval(interval);
+    if (!hasOngoingActivity) {
+      return;
     }
+
+    let lastMinute = new Date().getMinutes();
+
+    const interval = setInterval(() => {
+      const currentMinute = new Date().getMinutes();
+      if (currentMinute !== lastMinute) {
+        lastMinute = currentMinute;
+        // The minute has changed, trigger a re-render to update calculations.
+        setActivities(acts => [...acts]);
+      }
+    }, 1000); // Check every second.
+
+    return () => clearInterval(interval);
   }, [activities, setActivities]);
 
   const handleSaveSettings = (newSettings: AppSettings) => {
